@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, Req, Res, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Post, Get, Req, Res, UseInterceptors, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JoinRequestDto } from './dto/join.request.dto';
 import { UsersService } from './users.service';
@@ -39,6 +39,7 @@ export class UsersController {
     description: '서버 에러',
   })
   @ApiOperation({ summary: '로그인' })
+  @UseGuards(LocalAuthGuard)
   @Post('login')
   logIn(@User() user) {
     return user;
