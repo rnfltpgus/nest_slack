@@ -8,6 +8,7 @@ export class AppService {
   async getHello() {
     this.usersService.getUser();
     this.getWow();
+
     return process.env.SECRET; // better: this.configService.get('SECRET');
   }
 

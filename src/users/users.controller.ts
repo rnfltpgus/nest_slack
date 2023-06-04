@@ -3,8 +3,10 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JoinRequestDto } from './dto/join.request.dto';
 import { UsersService } from './users.service';
 import { UserDto } from '../common/dto/user.dto';
-import { User } from 'src/common/decorators/user.decorator';
+import { User } from '../common/decorators/user.decorator';
+import { UndefinedToNullInterceptor } from '../common/interceptors/undefinedToNull.interceptor';
 
+@UseInterceptors(UndefinedToNullInterceptor)
 @ApiTags('USER')
 @Controller('api/users')
 export class UsersController {
@@ -23,8 +25,8 @@ export class UsersController {
 
   @ApiOperation({ summary: '회원가입' })
   @Post()
-  postUsers(@Body() data: JoinRequestDto) {
-    this.usersService.postUsers(data.email, data.nickname, data.password);
+  async join(@Body() body: JoinRequestDto) {
+    await this.usersService.join(body.email, body.nickname, body.password);
   }
 
   @ApiResponse({
