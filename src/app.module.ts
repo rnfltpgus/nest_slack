@@ -10,17 +10,19 @@ import { DmsModule } from './dms/dms.module';
 import { UsersService } from './users/users.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from './entities/Users';
-import { ChannelChats } from './entities/ChannelChats';
+import { AuthModule } from './auth/auth.module';
+import { Workspaces } from './entities/Workspaces';
+import { WorkspaceMembers } from './entities/WorkspaceMembers';
 import { ChannelMembers } from './entities/ChannelMembers';
+import { ChannelChats } from './entities/ChannelChats';
 import { Channels } from './entities/Channels';
 import { DMs } from './entities/DMs';
 import { Mentions } from './entities/Mentions';
-import { WorkspaceMembers } from './entities/WorkspaceMembers';
-import { Workspaces } from './entities/Workspaces';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    AuthModule,
     UsersModule,
     WorkspacesModule,
     ChannelsModule,
@@ -42,12 +44,14 @@ import { Workspaces } from './entities/Workspaces';
         WorkspaceMembers,
         Workspaces,
       ],
+      // autoLoadEntities: true,
       keepConnectionAlive: true,
+      migrations: [__dirname + '/migrations/*.ts'],
+      charset: 'utf8mb4',
       synchronize: false,
       logging: true,
-      charset: 'utf8mb4_general_ci',
     }),
-    TypeOrmModule.forFeature([Users]),
+    TypeOrmModule.forFeature([Users, Workspaces, WorkspaceMembers, ChannelMembers]),
   ],
   controllers: [AppController],
   providers: [AppService, UsersService],
