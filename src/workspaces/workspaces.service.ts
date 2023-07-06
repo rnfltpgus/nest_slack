@@ -1,26 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ChannelMembers } from 'src/entities/ChannelMembers';
-import { Channels } from 'src/entities/Channels';
-import { Users } from 'src/entities/Users';
-import { WorkspaceMembers } from 'src/entities/WorkspaceMembers';
-import { Workspaces } from 'src/entities/Workspaces';
 import { Repository } from 'typeorm';
+import { ChannelMembers } from '../entities/ChannelMembers';
+import { Channels } from '../entities/Channels';
+import { Users } from '../entities/Users';
+import { WorkspaceMembers } from '../entities/WorkspaceMembers';
+import { Workspaces } from '../entities/Workspaces';
 
 @Injectable()
 export class WorkspacesService {
-  constructor(
-    @InjectRepository(Workspaces)
-    private workspacesRepository: Repository<Workspaces>,
-    @InjectRepository(Channels)
-    private channelsRepository: Repository<Channels>,
-    @InjectRepository(WorkspaceMembers)
-    private workspaceMembersRepository: Repository<WorkspaceMembers>,
-    @InjectRepository(ChannelMembers)
-    private channelMembersRepository: Repository<ChannelMembers>,
-    @InjectRepository(Users)
-    private usersRepository: Repository<Users>,
-  ) {}
+  @InjectRepository(Workspaces)
+  private workspacesRepository: Repository<Workspaces>;
+  @InjectRepository(Channels)
+  private channelsRepository: Repository<Channels>;
+  @InjectRepository(WorkspaceMembers)
+  private workspaceMembersRepository: Repository<WorkspaceMembers>;
+  @InjectRepository(ChannelMembers)
+  private channelMembersRepository: Repository<ChannelMembers>;
+  @InjectRepository(Users)
+  private usersRepository: Repository<Users>;
 
   async findById(id: number) {
     return this.workspacesRepository.findOne({ where: { id } });
@@ -39,17 +37,14 @@ export class WorkspacesService {
     workspace.name = name;
     workspace.url = url;
     workspace.OwnerId = myId;
-
     const returned = await this.workspacesRepository.save(workspace);
     const workspaceMember = new WorkspaceMembers();
     workspaceMember.UserId = myId;
     workspaceMember.WorkspaceId = returned.id;
     await this.workspaceMembersRepository.save(workspaceMember);
-
     const channel = new Channels();
     channel.name = '일반';
     channel.WorkspaceId = returned.id;
-
     const channelReturned = await this.channelsRepository.save(channel);
     const channelMember = new ChannelMembers();
     channelMember.UserId = myId;
@@ -77,7 +72,6 @@ export class WorkspacesService {
         },
       },
     });
-
     const user = await this.usersRepository.findOne({ where: { email } });
 
     if (!user) {
@@ -88,7 +82,6 @@ export class WorkspacesService {
     workspaceMember.WorkspaceId = workspace.id;
     workspaceMember.UserId = user.id;
     await this.workspaceMembersRepository.save(workspaceMember);
-
     const channelMember = new ChannelMembers();
     channelMember.ChannelId = workspace.Channels.find(v => v.name === '일반').id;
     channelMember.UserId = user.id;
